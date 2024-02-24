@@ -1,0 +1,6 @@
+#!/bin/bash
+./update-motd.d/10-banner
+./update-motd.d/20-sysinfo
+./update-motd.d/35-diskspace
+./update-motd.d/40-services
+./update-motd.d/92-unattended-upgrades

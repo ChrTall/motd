@@ -7,7 +7,7 @@ green="\e[1;32m"
 red="\e[1;31m"
 undim="\e[0m"
 
-services=("fail2ban" "ufw" "lxd" "netdata" "zed" "smartd" "postfix")
+services=("ufw" "smartd" "postfix")
 # sort services
 IFS=$'\n' services=($(sort <<<"${services[*]}"))
 unset IFS
@@ -19,7 +19,7 @@ for service in "${services[@]}"; do
 done
 
 out=""
-for i in ${!services[@]}; do
+for i in "${!services[@]}"; do
     # color green if service is active, else red
     if [[ "${service_status[$i]}" == "active" ]]; then
         out+="${services[$i]}:,${green}${service_status[$i]}${undim},"
@@ -27,11 +27,11 @@ for i in ${!services[@]}; do
         out+="${services[$i]}:,${red}${service_status[$i]}${undim},"
     fi
     # insert \n every $COLUMNS column
-    if [ $((($i+1) % $COLUMNS)) -eq 0 ]; then
+    if [ $((($i + 1) % $COLUMNS)) -eq 0 ]; then
         out+="\n"
     fi
 done
 out+="\n"
 
-printf "\nservices:\n"
+printf "\n======================  Services  =======================\n"
 printf "$out" | column -ts $',' | sed -e 's/^/  /'
