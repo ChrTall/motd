@@ -1,4 +1,4 @@
 #!/bin/bash
 
-printf "\n"
+printf "\n  "
 uptime -p

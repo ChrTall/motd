@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# get interfaces with status (except loopback)
+INTERFACES=($(ip address | awk '!/^[[:blank:]]/ { if($2 != "lo:") { print $2 }}' | sed 's/[:]//' | cut -f1 -d'@'))
+# collect status of each interface
+INTERFACES_STATUS=()
+for iface in "${INTERFACES[@]}"; do
+    INTERFACES_STATUS+=($(ip address show $iface | awk '!/^[[:blank:]]/ { print $9 }' | sed 's/[:]//'))
+done
+
+# Format Output
+white="\e[0;39m"
+green="\e[1;32m"
+red="\e[1;31m"
+undim="\e[0m"
+INTERFACES_TEXT=""
+
+for i in "${!INTERFACES[@]}"; do
+    # color green if status is UP, else red
+    if [[ "${INTERFACES_STATUS[$i]}" == "UP" ]]; then
+        # Get IPv4-Address of interface.
+        INTERFACES_TEXT+="${INTERFACES[$i]} ${green}${INTERFACES_STATUS[$i]}${undim} $(ip addr show "${INTERFACES[$i]}" | grep -Po 'inet \K[\d.]+') \n"
+    else
+        INTERFACES_TEXT+="${INTERFACES[$i]} ${red}${INTERFACES_STATUS[$i]}${undim} \n"
+    fi
+done
+
+printf "\n======================== ${white}Network ========================\n"
+printf "$INTERFACES_TEXT" | column -t -N "Interface","Status","IPv4-Address" | sed -e 's/^/  /'
